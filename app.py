@@ -39,7 +39,20 @@ with st.sidebar:
         "💲 Each run uses Claude + web search; cost is typically $1–3 per zip."
     )
 
-    run_button = st.button("🔎 Find Leads", type="primary", use_container_width=True)
+    has_api_key = bool(os.getenv("ANTHROPIC_API_KEY"))
+    run_button = st.button(
+        "🔎 Find Leads",
+        type="primary",
+        use_container_width=True,
+        disabled=not has_api_key,
+        help=None if has_api_key else "Live runs are disabled in this demo. Use the 'Load a previous run' dropdown below to explore saved results.",
+    )
+    if not has_api_key:
+        st.info(
+            "🎓 **Demo mode.** Live runs are disabled to keep API costs at $0. "
+            "Use **Load a previous run** below to explore saved demo CSVs for "
+            "zips 94507, 75205, and 92647."
+        )
 
 # ---------- Sidebar: Prior runs ----------
 
@@ -176,4 +189,3 @@ else:
         - A 0–100 warmth score so the hottest leads sit at the top
         """
     )
-    

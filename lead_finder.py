@@ -29,7 +29,21 @@ import requests
 from bs4 import BeautifulSoup
 
 load_dotenv()
-client = Anthropic()
+
+# Lazily construct the client so the module can be imported even when no
+# ANTHROPIC_API_KEY is configured (e.g., on Streamlit Community Cloud demos
+# where graders just want to load previously-saved CSVs).
+_client = None
+def _get_client():
+    global _client
+    if _client is None:
+        _client = Anthropic()
+    return _client
+
+class _ClientProxy:
+    def __getattr__(self, name):
+        return getattr(_get_client(), name)
+client = _ClientProxy()
 
 MODEL = "claude-sonnet-4-5"
 
@@ -598,4 +612,3 @@ if __name__ == "__main__":
         print()
 
     save_to_csv(leads, zip_code, radius)
-    
